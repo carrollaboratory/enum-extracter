@@ -1,6 +1,5 @@
-# term-weaver
-Materialize LinkML enumerations
-
+# enum-extracter
+Extract enumerations from a LinkML model file.
 
 ## Install
 For using on a local machine, it is recommended to add the dev dependencies: 

@@ -25,6 +25,7 @@ def extract_enums(
     model_id = source_parsed.get("id")
     enums = parsed.get("enums")
 
+    output_filepath.mkdir(parents=True, exist_ok=True)
     for name, enum in enums.items():
         with (output_filepath / f"{name}.yaml").open("wt") as extracted:
             extracted.write("---\n")

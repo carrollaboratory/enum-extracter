@@ -1,0 +1,209 @@
+
+# ============================================================
+# Design Document Template
+# claude.ai | AI-Assisted Design Document
+# ============================================================
+
+metadata:
+  title: "Term Weaver"
+  version: "0.1.0"
+  status: draft                  # draft | review | approved
+  created: "2026-05-13"
+  updated: "2026-05-13"
+  author: "[Eric Torstenson]"
+  reviewers: []
+
+# ============================================================
+# 1. OVERVIEW
+# ============================================================
+overview:
+  summary: >
+    Automate the process of materializing the intensional enumerations for a 
+    LinkML model and build out a functional LinkML model containing those
+    extensional enums as standalone YAML model components. 
+  goals:
+    - "Intensional enums will be remain independent of the actual LinkML model and never be replaced by extensional products of the materializations."
+    - "Output from the materialization will be independent YAML files to minimize merge-conflicts and help with PR reviews."
+    - "If there are enumerations present in the source YAML file, they will carry over untouched and be available alongisde the products of materialization."
+    - "Output will be a 'complete' LinkML model that can be built and reviewed as any other model, even if there are no classes."
+    - "Refreshing enums periodically to incorporate changes from external ontologies over time."
+    - "Maintain the unmaterialized, intensional enumerations to accomadate changes over time."
+  non_goals:
+    - "Full automation of the process"
+
+# ============================================================
+# 2. CONTEXT & MOTIVATION
+# ============================================================
+context:
+  background: >
+    There is a real need for access to explicit terms for both validation and
+    model use where possible. 
+  motivation: >
+    The process of performing this manually is very time consuming and error prone and is likely to not to be entirely a "one off" task. 
+  references:
+    - label: "Semantic Enumerations"
+      url: "https://linkml.io/linkml/schemas/enums.html"
+
+# ============================================================
+# 3. SCOPE
+# ============================================================
+scope:
+  in_scope:
+    - "Materialize enumerations using [vskit](https://github.com/INCATools/ontology-access-kit)"
+    - "Build functional LinkML 'project' based on results from materialization using jinja"
+  out_of_scope:
+    - "General model definition and validation."
+  constraints:
+    - "For now, only those ontologies recognized by vskit (bioregistry) will be supported."
+  assumptions:
+    - "LinkML 'intensional' enumerations are well formed and 'complete' for this purpose."
+
+# ============================================================
+# 4. STAKEHOLDERS
+# ============================================================
+stakeholders:
+  - role: Developer
+    name: "Yelena Cox"
+    responsibilities:
+      - "Author and Maintainer of the application"
+
+# ============================================================
+# 5. TECHNICAL DESIGN
+# ============================================================
+technical_design:
+
+  architecture:
+    description: >
+      LinkML 'model' will be maintained as part of a single YAML file. The output will be a functional LinkML model containing all materialized enums and can be tested and reviewed using any LinkML tooling. 
+    components:
+      - name: "Spinner"
+        description: "Extract key data points from the LinkML YAML source file to be used when building out the final YAML model files."
+        technology: "python"
+      - name: "Spool"
+        description: "Automates the execution of the vskit"
+        technology: "python + vskit"
+      - name: "Weave"
+        description: "Build out the functional LinkML model that can be imported by downstream models"
+        technology: "python + jinja"
+
+  interfaces:
+    inputs:
+      - name: "source YAML"
+        format: "CLI Arg/filename"
+        description: "This houses the source YAML definitions that are to be materialized"
+    outputs:
+      - name: "LinkML Schema"
+        format: "multifile YAML"
+        description: "This will be a fully functional LinkML model that can be imported by downstream models"
+
+  dependencies:
+    internal: []
+    external:
+      - name: "LinkML"
+        version: ""
+        purpose: "Provide validation of resulting model components tooling for reviewing materialized output"
+      - name: "ontology-access-kit"
+        version: ""
+        purpose: "This does the heavy lifting of the materializations"
+      - name: "argparse"
+        version: "stdlib"
+        purpose: "CLI argument parsing — Python's built-in equivalent of minimist/yargs"
+        docs_url: "https://docs.python.org/3/library/argparse.html"
+      - name: "pathlib"
+        version: "stdlib"
+        purpose: "Python classes representing filesystem paths with semantics appropriate for different operating systems."
+        docs_url: "https://docs.python.org/3/library/pathlib.html"
+      - name: "pyyaml"
+        version: ""
+        purpose: "Python library that provides ability to serialize python objects <=> YAML format."
+        docs_url: "https://pyyaml.org/"
+      - name: "subprocess"
+        version: "stdlib"
+        purpose: "Execute vskit and capture stderr and stdout to local variables"
+        docs_url: 
+          - label: Official Docs
+            url: "https://docs.python.org/3/library/subprocess.html"
+          - label: Tutorial
+            url: "https://www.geeksforgeeks.org/python/python-subprocess-module/"
+
+
+# ============================================================
+# 6. IMPLEMENTATION APPROACH
+# ============================================================
+implementation:
+  strategy: >
+    Parse the incoming YAML file for details required for final model construction. Run vskit and extract final model files from the end product to allow user to intiate a Pull Request.
+  phases:
+    - phase: 1
+      name: "Initial MVP"
+      description: "The first pass will automate the materialization of the model's terms suitable for github PR review. The tool will initially not be automated, and output can be reviewed directly by the user."
+  error_handling: >
+    Errors will be logged using standard python logging.
+  logging: >
+    All log-levels should be supported with a reasonable defult (INFO). 
+    - At the DEBUG level, all information captured from the vskit should be provided.
+    - At INFO, only highlights of what is being done and which files are read/written
+    - All errors and warnings will be clearly noted as such in the logs. 
+
+# ============================================================
+# 7. TESTING STRATEGY
+# ============================================================
+testing:
+  approach: >
+    Basic tests from the application itself to confirm all relevant artifacts defined within the original YAML file were written to their corresponding location in the final model
+  acceptance_criteria:
+    - "Errors must be raised if these counts don't align exactly"
+
+# ============================================================
+# 8. RISKS & MITIGATIONS
+# ============================================================
+risks:
+  - id: R-001
+    description: "Materialization depends on an external tool which may not perform exactly as we need/expect."
+    likelihood: low         # low | medium | high
+    impact: low             # low | medium | high
+    mitigation: "By separating the materialization of these enumerations from the source models and requiring form review of all changes, we should be able to catch any surprises before the changes are incorporated into the final models."
+
+
+# ============================================================
+# 9. OPEN QUESTIONS
+# ============================================================
+open_questions:
+  - id: Q-001
+    question: "How does LinkML and vskit handle situations like 'All of this stuff under code xyz from SNOMED, but also all of these codes from FHIR null-flavor'"
+    owner: "Robert"
+    due: "2026-06-30"
+
+# ============================================================
+# 10. DECISION LOG
+# ============================================================
+decision_log:
+  - id: D-001
+    date: "2026-05-13"
+    decision: "Input 'model' will be completely independet from the output model (separate repo). The relationship here is 1 to 1."
+    rationale: "Cleaner input/output. Keeps PR Review isolated. Downstream models can 'pick and choose' the relevant sets of enumerations to use."
+    alternatives_considered:
+      - "Many input to 1 materialized repo. This was not well suited for the goals"
+  - id: D-002
+    date: "2026-05-13"
+    descision: "One enum per YAML"
+    rationale: "1 yaml per enum. That way you can see the file names that changed = enumerations that changed. Input/output YAML file counts will match."
+    alternatives_considered:
+      - "1 input YAML to many output YAML files."
+
+# ============================================================
+# 11. APPENDIX
+# ============================================================
+appendix:
+  glossary:
+    - term: "materialization"
+      definition: "the process of computing, executing, and physically storing the concrete instances (the extension) derived from an abstract definition or rule (the intension)"
+    - term: "intensional"
+      definition: "Abstract definition of the model component containing rules, attributes, constraints and logic an object must satisfy. In our case, this is the unmaterialized enumeration"
+    - term: "extensional"
+      definition: "The realized data object. In our case, the extensional model components will have been materialized"
+    - term: "vskit" 
+      definition: "The oaklib tool that provides the materialization of the enumerated values based on the linkml definitions provided"
+  diagrams: []
+  notes: >
+    [Any additional free-form notes.]

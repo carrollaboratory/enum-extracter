@@ -1,0 +1,54 @@
+default_prefix: cam
+default_range: string
+description: LinkML Schema for the Common Access Model
+id: https://includedcc.org/common-access-model
+imports:
+- linkml:types
+- EnumDataUsePermission
+- EnumDataUseModifier
+- EnumProgram
+- EnumResearchDomain
+- EnumParticipantLifespanStage
+- EnumStudyDesign
+- EnumClinicalDataSourceType
+- EnumDataCategory
+- EnumSubjectType
+- EnumSex
+- EnumRace
+- EnumEthnicity
+- EnumVitalStatus
+- EnumNull
+- EnumFamilyType
+- EnumConsanguinityAssertion
+- EnumAssertionProvenance
+- EnumAvailabilityStatus
+- EnumSampleCollectionMethod
+- EnumSite
+- EnumSpatialQualifiers
+- EnumLaterality
+- EnumEDAMFormats
+- EnumEDAMDataTypes
+- EnumFileHashType
+license: MIT
+name: common-access-model
+prefixes:
+  DUO: http://purl.obolibrary.org/obo/DUO_
+  HP: http://purl.obolibrary.org/obo/HP_
+  MONDO: http://purl.obolibrary.org/obo/MONDO_
+  NCIT: http://purl.obolibrary.org/obo/NCIT_
+  PATO: http://purl.obolibrary.org/obo/PATO_
+  cam: https://includedcc.org/common-access-model/
+  cdc_race_eth: urn:oid:2.16.840.1.113883.6.238/
+  hl7_null: http://terminology.hl7.org/CodeSystem/v3-NullFlavor/
+  ig2_biospecimen_availability: https://nih-ncpi.github.io/ncpi-fhir-ig-2/CodeSystem/biospecimen-availability/
+  ig2dac: https://nih-ncpi.github.io/ncpi-fhir-ig-2/CodeSystem/research-data-access-code/
+  ig2dat: https://nih-ncpi.github.io/ncpi-fhir-ig-2/CodeSystem/research-data-access-type/
+  ig_dob_method: https://nih-ncpi.github.io/ncpi-fhir-ig-2/CodeSystem/research-data-date-of-birth-method/
+  igcondtype: https://nih-ncpi.github.io/ncpi-fhir-ig-2/CodeSystem/condition-type/
+  linkml: https://w3id.org/linkml/
+  mesh: http://id.nlm.nih.gov/mesh/
+  schema: http://schema.org/
+  snomed_ct: http://snomed.info/id/
+see_also:
+- https://includedcc.github.io/common-access-model
+title: Common Access Model

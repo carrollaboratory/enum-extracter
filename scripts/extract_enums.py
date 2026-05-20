@@ -35,6 +35,7 @@ def extract_enums(
                 Dumper=IndentedDumper,
                 indent=2,
                 default_flow_style=False,
+                sort_keys=False
             )
 
     return enums.keys()

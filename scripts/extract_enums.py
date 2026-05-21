@@ -27,8 +27,6 @@ def extract_enums(
         output_filepath: The directory where the enum YAMLs are to be written
     Returns:
         list of enum names
-    Raises:
-        (put any exceptions that may be thrown if problems are encountered)
     """
     with local_filepath.open("rt") as enums:
         parsed = yaml.safe_load(enums)
